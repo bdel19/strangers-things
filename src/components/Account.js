@@ -1,18 +1,18 @@
 import React, {useState} from 'react'
-import {registerUser} from "../api/api";
+import {registerUser, loginUser} from "../api/api";
 import { useParams, useHistory } from "react-router-dom";
 
 const Account = ( {setToken} ) => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const {action} = useParams();
-    const history= useHistory()
-    console.log("action", action);
+    const history = useHistory();
+    console.log("running Accout", action)
 
     const onSubmitHandler = async(event) => {
         event.preventDefault();
-        
-        const {error, token, message} = await registerUser(username, password);
+        const authFn = action === "register" ? registerUser : loginUser
+        const {error, token, message} = await authFn(username, password);
 
         console.error(error);
 
@@ -51,7 +51,7 @@ const Account = ( {setToken} ) => {
             </div>
             <button className="ui button" type="submit">{title}</button>
         </form>
-    )
+    );
 };
 
 export default Account;

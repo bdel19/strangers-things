@@ -1,19 +1,24 @@
 import React, {useState, useEffect } from "react";
-import { Home, Posts, Account } from "./components";
+import { Home, Posts, Account, PostCreateForm } from "./components";
 import { Route, Switch, Link, useHistory } from "react-router-dom";
 import { fetchPosts, fetchUser } from "./api/api";
 import "./App.css";
 
 const App = () => {
+    console.log("running App")
     const [posts, setPosts] = useState([]);
-    const [token, setToken] = useState(window.localStorage.getItem("token") || null);
+    const [token, setToken] = useState(
+        window.localStorage.getItem("token") || null
+    );
     const [user, setUser] = useState(null);
+
     const history = useHistory();
     
 
     useEffect(() => {
         const getPosts = async() => {
-            const {error, posts} = await fetchPosts();
+            console.log("running getPosts")
+            const {error, posts} = await fetchPosts(token);
 
             if (error) {
                 console.error(error)
@@ -25,26 +30,30 @@ const App = () => {
     }, []);
 
     useEffect(() => {
-        console.log("HEY!");
         if (token) {
             const getUser = async () => {
+                console.log("running getUser")
                 const { user } = await fetchUser(token);
-                setUser(posts.username);
-                console.log("USER",user);
-            }
+                setUser(user);
+                console.log("USER", user);
+            };
             getUser();
-        }
+        };
     }, [token]);
 
     useEffect(() => {
-        window.localStorage.setItem("token", token)
+        if (token){
+        window.localStorage.setItem("token", token);
+        } else {
+            window.localStorage.removeItem("token");
+        }
     },[token]);
 
     const logOut = () => {
-        setToken("");
+        setToken(null);
         setUser(null);
         history.push("/");
-    }
+    };
 
     return (
         <div className="container">
@@ -59,22 +68,30 @@ const App = () => {
                     ):(
                     <>
                     <Link className="item" to ="/account/login">Log In</Link>
-                    <Link className="item" to ="/account/signup">Sign Up</Link>
+                    <Link className="item" to ="/account/register">Sign Up</Link>
                     </>
                     )}
                     
                 </span>
             </nav>
             <Switch>
-                <Route className="item" exact path="/">
+                
+                <Route exact path="/">
                     <Home user = {user}/>
                 </Route>
-                <Route className="item" path="/posts">
-                    <Posts posts={posts}/>
+                
+                <Route className="item" path="/posts/create">
+                    <PostCreateForm token={token} setPosts={setPosts}/>
                 </Route>
+                
+                <Route className="item" path="/posts">
+                    <Posts posts={posts} token={token} setPosts={setPosts}/>
+                </Route>
+                
                 <Route className="item" path="/account/:action">
                     <Account setToken={setToken}/>
                 </Route>
+
             </Switch>
         </div>
     );

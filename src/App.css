@@ -6,3 +6,6 @@ h1{
     display: flex;
     justify-content: center;}
 
+.post-container{
+    padding: 25px;
+}

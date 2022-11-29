@@ -1,6 +1,7 @@
 import React from 'react';
 
 const Home = ({user}) => {
+    console.log("running Home")
     return (
         <div>
             <h1 className="ui header">Stranger's Things</h1>
